@@ -7,8 +7,8 @@
 #include <LibCore/ArgsParser.h>
 #include <LibCore/ProcessStatisticsReader.h>
 #include <LibCore/System.h>
+#include <LibGUI/Session.h>
 #include <LibMain/Main.h>
-#include <LibSession/Session.h>
 #include <signal.h>
 
 static Core::ProcessStatistics const& get_proc(Core::AllProcessesStatistics const& stats, pid_t pid)
@@ -35,7 +35,7 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
 
     Core::EventLoop event_loop;
 
-    auto& session = Session::Session::the();
+    auto& session = GUI::Session::the();
     if (session.is_exit_inhibited() && !force) {
         warnln("Logout is inhibited, use \"logout -f\" to force");
         session.report_inhibited_exit_prevention();

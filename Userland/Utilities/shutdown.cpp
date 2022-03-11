@@ -8,8 +8,8 @@
 
 #include <LibCore/ArgsParser.h>
 #include <LibCore/Stream.h>
+#include <LibGUI/Session.h>
 #include <LibMain/Main.h>
-#include <LibSession/Session.h>
 
 ErrorOr<int> serenity_main(Main::Arguments arguments)
 {
@@ -18,7 +18,7 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
     args_parser.add_option(force, "Force shutdown even if it is inhibited", "force", 'f');
     args_parser.parse(arguments);
 
-    auto& session = Session::Session::the();
+    auto& session = GUI::Session::the();
     if (session.is_exit_inhibited() && !force) {
         warnln("Shutdown is inhibited, use \"shutdown -f\" to force");
         session.report_inhibited_exit_prevention();

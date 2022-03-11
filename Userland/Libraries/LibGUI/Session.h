@@ -6,10 +6,10 @@
 
 #pragma once
 
+#include "Application.h"
 #include <AK/Function.h>
-#include <LibGUI/Application.h>
 
-namespace Session {
+namespace GUI {
 
 class Session {
 public:

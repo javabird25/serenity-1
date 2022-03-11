@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
+#include "Session.h"
 #include <LibIPC/ConnectionToServer.h>
-#include <LibSession/Session.h>
 #include <SessionServer/SessionExitInhibitionClientEndpoint.h>
 #include <SessionServer/SessionExitInhibitionServerEndpoint.h>
 
-namespace Session {
+namespace GUI {
 
 class ConnectionToSessionExitInhibitionServer final
     : public IPC::ConnectionToServer<SessionExitInhibitionClientEndpoint, SessionExitInhibitionServerEndpoint>

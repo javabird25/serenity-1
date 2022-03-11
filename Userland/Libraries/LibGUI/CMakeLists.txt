@@ -23,11 +23,13 @@ set(SOURCES
     ColorInput.cpp
     ColorPicker.cpp
     ColumnsView.cpp
-    CommonActions.cpp
-    CommonLocationsProvider.cpp
     ComboBox.cpp
     Command.cpp
     CommandPalette.cpp
+    CommonActions.cpp
+    CommonLocationsProvider.cpp
+    ConnectionToWindowMangerServer.cpp
+    ConnectionToWindowServer.cpp
     Desktop.cpp
     Dialog.cpp
     DisplayLink.cpp
@@ -89,6 +91,7 @@ set(SOURCES
     ScrollableContainerWidget.cpp
     Scrollbar.cpp
     SeparatorWidget.cpp
+    Session.cpp
     SettingsWindow.cpp
     Shortcut.cpp
     Slider.cpp
@@ -112,8 +115,6 @@ set(SOURCES
     VimEditingEngine.cpp
     Widget.cpp
     Window.cpp
-        ConnectionToWindowServer.cpp
-        ConnectionToWindowMangerServer.cpp
     Wizards/WizardDialog.cpp
     Wizards/AbstractWizardPage.cpp
     Wizards/CoverWizardPage.cpp
