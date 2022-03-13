@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
+#include "Session.h"
 #include <AK/Debug.h>
 #include <AK/HashMap.h>
 #include <AK/IDAllocator.h>
@@ -90,6 +91,14 @@ Window::Window(Core::Object* parent)
     REGISTER_RECT_PROPERTY("rect", rect, set_rect);
     REGISTER_SIZE_PROPERTY("base_size", base_size, set_base_size);
     REGISTER_SIZE_PROPERTY("size_increment", size_increment, set_size_increment);
+
+    Session::the().on_inhibited_exit_prevented = [&] {
+        deferred_invoke([&] {
+            dbgln("{}", (int)on_close_request.m_kind);
+            if (on_close_request)
+                on_close_request();
+        });
+    };
 }
 
 Window::~Window()
@@ -1240,6 +1249,11 @@ void Window::set_modified(bool modified)
     if (!m_window_id)
         return;
     ConnectionToWindowServer::the().async_set_window_modified(m_window_id, modified);
+    auto& session = Session::the();
+    if (modified)
+        session.inhibit_exit();
+    else
+        session.allow_exit();
 }
 
 void Window::flush_pending_paints_immediately()

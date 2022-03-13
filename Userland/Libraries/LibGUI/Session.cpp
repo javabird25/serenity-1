@@ -34,11 +34,8 @@ static RefPtr<ConnectionToSessionExitInhibitionServer> s_connection;
 
 static ConnectionToSessionExitInhibitionServer& connection()
 {
-    auto result = ConnectionToSessionExitInhibitionServer::try_create();
-    if (result.is_error())
-        dbgln("Session: {}", result.error());
-    else
-        s_connection = result.release_value();
+    if (!s_connection)
+        s_connection = ConnectionToSessionExitInhibitionServer::try_create().release_value();
     return *s_connection;
 }
 

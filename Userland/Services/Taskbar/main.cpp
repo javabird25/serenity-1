@@ -272,7 +272,9 @@ ErrorOr<NonnullRefPtr<GUI::Menu>> build_system_menu()
     }));
     system_menu->add_separator();
     system_menu->add_action(GUI::Action::create("E&xit...", Gfx::Bitmap::try_load_from_file("/res/icons/16x16/power.png").release_value_but_fixme_should_propagate_errors(), [](auto&) {
-        if (GUI::Session::the().is_exit_inhibited()) {
+        auto &session = GUI::Session::the();
+        if (session.is_exit_inhibited()) {
+            session.report_inhibited_exit_prevention();
             auto result = SessionExitInhibitionDialog::show();
             if (result == SessionExitInhibitionDialog::ExecResult::ExecCancel)
                 return;

@@ -27,8 +27,6 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
 
     auto app = GUI::Application::construct(arguments.argc, arguments.argv);
 
-    TRY(Core::System::pledge("stdio getkeymap thread rpath cpath wpath recvfd sendfd"));
-
     auto app_icon = GUI::Icon::default_icon("app-keyboard-mapper");
 
     auto window = GUI::Window::construct();
@@ -43,7 +41,7 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
     else
         TRY(keyboard_mapper_widget->load_map_from_file(path));
 
-    TRY(Core::System::pledge("stdio thread rpath cpath wpath recvfd sendfd"));
+    TRY(Core::System::pledge("stdio thread rpath cpath wpath recvfd sendfd unix"));
 
     auto open_action = GUI::CommonActions::make_open_action(
         [&](auto&) {

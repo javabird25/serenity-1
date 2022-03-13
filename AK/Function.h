@@ -29,6 +29,7 @@
 #include <AK/Assertions.h>
 #include <AK/Atomic.h>
 #include <AK/BitCast.h>
+#include <AK/Format.h>
 #include <AK/Noncopyable.h>
 #include <AK/ScopeGuard.h>
 #include <AK/StdLibExtras.h>
@@ -45,6 +46,9 @@ inline constexpr bool IsFunctionPointer = (IsPointer<F> && IsFunction<RemovePoin
 // Not a function pointer, and not an lvalue reference.
 template<typename F>
 inline constexpr bool IsFunctionObject = (!IsFunctionPointer<F> && IsRvalueReference<F&&>);
+
+const unsigned int VALID_CANARY = 0xCA11AB1E;
+const unsigned int INVALID_CANARY = 0xBAADCA11;
 
 template<typename Out, typename... In>
 class Function<Out(In...)> {
@@ -81,6 +85,10 @@ public:
     // Note: Despite this method being const, a mutable lambda _may_ modify its own captures.
     Out operator()(In... in) const
     {
+        if (m_canary != VALID_CANARY) {
+            dbgln("AK::Function: call-after-free (canary is {}, expected {})", m_canary, VALID_CANARY);
+            VERIFY_NOT_REACHED();
+        }
         auto* wrapper = callable_wrapper();
         VERIFY(wrapper);
         ++m_call_nesting_level;
@@ -183,6 +191,7 @@ private:
         case FunctionKind::Outline:
             return *bit_cast<CallableWrapperBase**>(&m_storage);
         default:
+            dbgln("Unknown function kind: {}", (int)m_kind);
             VERIFY_NOT_REACHED();
         }
     }
@@ -205,13 +214,18 @@ private:
             VERIFY(wrapper);
             wrapper->destroy();
         }
+        m_canary = INVALID_CANARY;
         m_kind = FunctionKind::NullPointer;
     }
 
     template<typename Callable>
     void init_with_callable(Callable&& callable)
     {
-        VERIFY(m_call_nesting_level == 0);
+        if (m_call_nesting_level != 0) {
+            dbgln("AK::Function::init_with_callable inside AK::Function calls is not supported, "
+                  "try wrapping the nested call in deferred_invoke().");
+            VERIFY_NOT_REACHED();
+        }
         using WrapperType = CallableWrapper<Callable>;
         if constexpr (sizeof(WrapperType) > inline_capacity) {
             *bit_cast<CallableWrapperBase**>(&m_storage) = new WrapperType(forward<Callable>(callable));
@@ -242,8 +256,11 @@ private:
         }
         other.m_kind = FunctionKind::NullPointer;
     }
-
+public:
     FunctionKind m_kind { FunctionKind::NullPointer };
+
+private:
+    unsigned int m_canary = VALID_CANARY;
     bool m_deferred_clear { false };
     mutable Atomic<u16> m_call_nesting_level { 0 };
     // Empirically determined to fit most lambdas and functions.

@@ -41,6 +41,7 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
 
     TRY(Core::System::unveil("/res", "r"));
     TRY(Core::System::unveil("/tmp/portal/filesystemaccess", "rw"));
+    TRY(Core::System::unveil("/tmp/portal/session", "rw"));
     TRY(Core::System::unveil(nullptr, nullptr));
 
     hex_editor_widget->initialize_menubar(*window);

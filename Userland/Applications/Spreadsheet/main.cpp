@@ -44,6 +44,7 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
         }
     }
 
+    TRY(Core::System::unveil("/tmp/portal/session", "rw"));
     TRY(Core::System::unveil("/tmp/portal/webcontent", "rw"));
     // For writing temporary files when exporting.
     TRY(Core::System::unveil("/tmp", "crw"));
